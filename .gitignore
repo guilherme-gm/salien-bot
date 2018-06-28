@@ -2,3 +2,8 @@ node_modules
 package-lock.json
 gettoken.json
 log.txt
+
+stats/*
+!stats/.gitkeep
+tokens/*
+!tokens/.gitkeep

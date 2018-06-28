@@ -3,6 +3,7 @@
 const args = process.argv.slice(2);
 const network = require("./headless/network.js");
 const fs = require("fs");
+const Convert = require('ansi-to-html');
 
 const help_page = `
 Meeden's headless Salien bot
@@ -17,6 +18,7 @@ Options:
   --token TOKENFILE     Allow specifying a custom token file
   -c, --care-for-planet Bot tries to stay on the same planet and does not change the
                         planet even if difficulty would be better somewhere else.
+  -s, --stats FILENAME  Saves last iteration stats into FILENAME
 `;
 
 
@@ -26,6 +28,10 @@ let DO_LOGS = false;
 const log_file = "./log.txt";
 
 let token_file = "./gettoken.json";
+
+let save_stats = false;
+let stats = "./stats/mystats.html";
+let convert = new Convert();
 
 // clear log
 
@@ -59,6 +65,11 @@ for (let i = 0; i < args.length; i++) {
     else if (arg == "--help" || arg == "-h") {
         console.log(help_page);
         process.exit();
+    }
+    else if (arg == "--stats" && args[i+1]) {
+        save_stats = true;
+        i++;
+        stats = args[i];
     }
     else
         throw new Error(`invalid command line argument ${arg}`);
@@ -470,7 +481,18 @@ const PrintInfo = function PrintInfo() {
     for (let i = 0; i < info_lines.length; i++)
         info_lines[i] = "\x1b[33m" + info_lines[i].join(`${reset_code}: ${" ".repeat(max_length - info_lines[i][0].length)}`);
 
-    console.log("\x1b[2J\x1b[0;0H" + info_lines.join("\n"));
+        let text = info_lines.join("\n");
+        console.log("\x1b[2J\x1b[0;0H" + text);
+        if (save_stats == true) {
+            fs.writeFile(stats, convert.toHtml(text.replaceAll("\n", "<br />")), function(err) {});
+        }
+}
+
+String.prototype.replaceAll = function(search, replace) {
+    if (replace === undefined) {
+        return this.toString();
+    }
+    return this.split(search).join(replace);
 }
 
 setInterval(PrintInfo, 1000);
