@@ -436,6 +436,7 @@ const PrintInfo = function PrintInfo() {
     let info_lines = [];
     if (cl.gPlayerInfo) {
         let info = cl.gPlayerInfo;
+        info_lines.push(["Last Update", FormatTimer((Date.now() / 1000) | 0)]);
         info_lines.push(["Running for", FormatTimer(((Date.now() / 1000) | 0) - start_time)]);
         info_lines.push(["Current level", `${info.level} (${info.score} / ${info.next_level_score})`]);
         info_lines.push(["Exp since start", info.score - cl.gPlayerInfoOriginal.score]);
@@ -481,11 +482,11 @@ const PrintInfo = function PrintInfo() {
     for (let i = 0; i < info_lines.length; i++)
         info_lines[i] = "\x1b[33m" + info_lines[i].join(`${reset_code}: ${" ".repeat(max_length - info_lines[i][0].length)}`);
 
-        let text = info_lines.join("\n");
-        console.log("\x1b[2J\x1b[0;0H" + text);
-        if (save_stats == true) {
-            fs.writeFile(stats, convert.toHtml(text.replaceAll("\n", "<br />")), function(err) {});
-        }
+    let text = info_lines.join("\n");
+    console.log("\x1b[2J\x1b[0;0H" + text);
+    if (save_stats == true) {
+        fs.writeFile(stats, convert.toHtml(text.replaceAll("\n", "<br />")), function(err) {});
+    }
 }
 
 String.prototype.replaceAll = function(search, replace) {
@@ -495,7 +496,7 @@ String.prototype.replaceAll = function(search, replace) {
     return this.split(search).join(replace);
 }
 
-setInterval(PrintInfo, 1000);
+setInterval(PrintInfo, 60000);
 
 cl.Connect().then(() => {
     Finish();
