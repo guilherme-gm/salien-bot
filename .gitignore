@@ -7,3 +7,6 @@ stats/*
 !stats/.gitkeep
 tokens/*
 !tokens/.gitkeep
+# IDE
+/.idea
+*.swp
